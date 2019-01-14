@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+service NodeInformation {
+    // service to get the compute value of a node
+    rpc FindCompute(Node) returns (Compute) {}
+
+    //rpc Ping(Node) returns (PingResponse) {}
+}
+
+message Node {
+    // 256 bit node identification number
+    bytes nodeId = 1;
+    // domain of that node
+    string domain = 2;
+    // port of the node
+    int32 port = 3;
+}
+
+message Compute {
+    int32 time = 3; // time in miliseconds
+}

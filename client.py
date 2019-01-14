@@ -11,36 +11,26 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""The Python implementation of the GRPC helloworld.Greeter server."""
+"""The Python implementation of the GRPC helloworld.Greeter client."""
 
-from concurrent import futures
-import time
+from __future__ import print_function
 
 import grpc
+
 
 from protobuf.deviceSpecs import deviceSpecs_pb2
 from protobuf.deviceSpecs import deviceSpecs_pb2_grpc
 
-_ONE_DAY_IN_SECONDS = 60 * 60 * 24
 
-
-class Information(deviceSpecs_pb2_grpc.NodeInformationServicer):
-
-    def FindCompute(self, request, context):
-        return deviceSpecs_pb2.Compute(time=1)
-
-
-def serve():
-    server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
-    deviceSpecs_pb2_grpc.add_NodeInformationServicer_to_server(Information(), server)
-    server.add_insecure_port('[::]:5000')
-    server.start()
-    try:
-        while True:
-            time.sleep(_ONE_DAY_IN_SECONDS)
-    except KeyboardInterrupt:
-        server.stop(0)
+def run():
+    # NOTE(gRPC Python Team): .close() is possible on a channel and should be
+    # used in circumstances in which the with statement does not fit the needs
+    # of the code.
+    with grpc.insecure_channel('localhost:5000') as channel:
+        stub = deviceSpecs_pb2_grpc.NodeInformationStub(channel)
+        response = stub.FindCompute(deviceSpecs_pb2.Node(domain='localhost',port=5000,nodeId=bytes(1)))
+    print("Greeter client received: " + str(response.time))
 
 
 if __name__ == '__main__':
-    serve()
+    run()

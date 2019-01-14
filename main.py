@@ -17,7 +17,6 @@ def processingTime(d):
 
 def computePingTime(d1, d2):
 
-
 def computeLatencyTime(devices):
     for d in devices:
         pingTimes = []
